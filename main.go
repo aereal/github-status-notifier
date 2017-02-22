@@ -12,7 +12,7 @@ import (
 
 var listenPort = flag.Int("port", 8000, "port to listen")
 
-var config Config
+var config *Config
 
 type GitHubStatusEvent struct {
 	Context     string           `json:"context"`

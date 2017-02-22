@@ -20,14 +20,14 @@ type SlackNotificationConfig struct {
 	IconEmoji  string
 }
 
-func ParseConfigFile(filename string) (config Config, err error) {
+func ParseConfigFile(filename string) (*Config, error) {
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return
+		return nil, err
 	}
 	err = json.Unmarshal(body, &config)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
+	return config, nil
 }
