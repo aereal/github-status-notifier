@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +10,13 @@ import (
 )
 
 var listenPort = flag.Int("port", 8000, "port to listen")
+
+type GitHubStatusEvent struct {
+	Context     string `json:"context"`
+	State       string `json:"state"`
+	Description string `json:"description"`
+	TargetURL   string `json:"target_url"`
+}
 
 func main() {
 	flag.Parse()
@@ -25,7 +33,19 @@ func main() {
 
 		githubEvent := r.Header.Get("X-GitHub-Event")
 		githubDelivery := r.Header.Get("X-GitHub-Delivery")
-		log.Printf("event:%s delivery:%s payload:%s", githubEvent, githubDelivery, string(bodyBytes))
+
+		if githubEvent == "status" {
+			var statusEvent GitHubStatusEvent
+			if err := json.Unmarshal(bodyBytes, &statusEvent); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, "error:%q", err)
+				return
+			}
+
+			log.Printf("%#q", statusEvent)
+		}
+
+		log.Printf("event:%s delivery:%s", githubEvent, githubDelivery)
 
 		fmt.Fprintln(w, "ok")
 	})
