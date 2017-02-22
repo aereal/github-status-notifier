@@ -12,6 +12,8 @@ import (
 
 var listenPort = flag.Int("port", 8000, "port to listen")
 
+var configFilename = flag.String("config", "config.json", "config file path")
+
 var config *Config
 
 type GitHubStatusEvent struct {
@@ -70,7 +72,7 @@ func handleHook(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 
-	config, err := ParseConfigFile("config.json")
+	config, err := ParseConfigFile(*configFilename)
 	if err != nil {
 		log.Fatal(err)
 	}
