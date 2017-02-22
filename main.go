@@ -1,13 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
+var listenPort = flag.Int("port", 8000, "port to listen")
+
 func main() {
+	flag.Parse()
+
 	http.HandleFunc("/hook", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("method:%s\tpath:%s\thost:%s", r.Method, r.URL.Path, r.Host)
 
@@ -36,7 +41,8 @@ func main() {
 		}
 	})
 
-	log.Println("---> start a server ...")
-	err := http.ListenAndServe(":8000", nil)
+	addr := fmt.Sprintf(":%d", *listenPort)
+	log.Printf("---> start a server at %s ...", addr)
+	err := http.ListenAndServe(addr, nil)
 	log.Fatal(err)
 }
